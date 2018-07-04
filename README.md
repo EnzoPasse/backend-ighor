@@ -2,7 +2,7 @@
 
 ## Description
 
-nest backend ighor
+backend de ighor
 
 ## Installation
 
