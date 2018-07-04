@@ -1,10 +1,16 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getRepository } from 'typeorm';
 import { Provincias } from './provincias.entity';
 import { CreateProvinciaDto } from './dto/create-provincia.dto';
 import { ProvinciaRO } from './provincia.interface';
 import { validate } from 'class-validator';
+import { async } from 'rxjs/internal/scheduler/async';
 
 @Injectable()
 export class ProvinciaService {
@@ -18,47 +24,48 @@ export class ProvinciaService {
   }
 
   async create(dto: CreateProvinciaDto): Promise<ProvinciaRO> {
-    const { nombre } = dto;
+    // const { nombre } = dto;
     /* const qb = await getRepository(Provincias)
       .createQueryBuilder('provincia')
       .where('provincia.nombre = :nombre', { nombre });
 
     const provincia = await qb.getOne(); */
 
-    const provincia = await this.provinciaRepository.findOne({nombre: `${dto.nombre}`});
+    const errordto = await validate(dto);
+    Logger.log('sera' + errordto.toString());
+
+    if (errordto.length > 0) {
+      const errors = { error: 'Nombre no válido' };
+      throw new HttpException(
+        { message: 'Fallo al ingresar los datos', errors },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const provincia = await this.provinciaRepository.findOne({
+      nombre: `${dto.nombre}`,
+    });
 
     if (provincia) {
-      const error = { nombre: 'La provincia ya existe' };
+      const errors = { error: 'La provincia ya existe' };
       throw new HttpException(
-        { message: 'Fallo al ingresar los datos', error },
+        { message: 'Fallo al ingresar los datos', errors },
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    // tslint:disable-next-line:prefer-const
-    let newProvincia = new Provincias();
-    newProvincia.nombre = nombre;
+    const newProvincia = new Provincias();
+    newProvincia.nombre = dto.nombre;
 
-    const errors = await validate(newProvincia);
+    Logger.log(JSON.stringify(dto));
+    Logger.log(JSON.stringify(newProvincia));
 
-    if (errors.length > 0) {
-      const _errors = { nombre: 'Nombre no valido' };
-      throw new HttpException(
-        { message: 'Fallo al ingresar los datos', _errors },
-        HttpStatus.BAD_REQUEST,
-      );
-    } else {
-      const saveProvincia = await this.provinciaRepository.save(newProvincia);
+    const saveProvincia = await this.provinciaRepository.save(newProvincia);
 
-      return this.buildProvinciaRO(saveProvincia);
-    }
+    return this.buildProvinciaRO(saveProvincia);
   }
 
   private buildProvinciaRO(provincia: Provincias) {
-    const ProvinciaRO = {
-      IdProvincia: provincia.IdProvincia,
-      nombre: provincia.nombre,
-    };
 
     // tslint:disable-next-line:prefer-const
     let returnProv = {
