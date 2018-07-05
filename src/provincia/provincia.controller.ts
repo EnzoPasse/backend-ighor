@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, UsePipes, ValidationPipe, UseFilters } from '@nestjs/common';
 import { ProvinciaService } from './provincia.service';
 import { Provincias } from './provincias.entity';
-import { ApiBearerAuth, ApiUseTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateProvinciaDto } from './dto/create-provincia.dto';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
 
 @ApiUseTags('provinicias')
 @Controller()
@@ -24,6 +25,7 @@ export class ProvinciaController {
   @ApiResponse({ status: 500, description: 'Server Error.' })
 
   @UsePipes(new ValidationPipe())
+  @UseFilters(new HttpExceptionFilter())
   @Post('provincia')
   async create(@Body () provinciaData: CreateProvinciaDto) {
     return await this.provinciaService.create(provinciaData);

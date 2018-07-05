@@ -1,11 +1,10 @@
 
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsAlpha } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 
 export class CreateProvinciaDto{
 
     @ApiModelProperty()
-    @IsNotEmpty()
-    @IsString()
+    @IsAlpha({message: 'Valor del $property inválido!'})
     readonly nombre: string;
 }

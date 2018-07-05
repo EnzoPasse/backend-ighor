@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getRepository } from 'typeorm';
 import { Provincias } from './provincias.entity';
@@ -19,8 +19,7 @@ export class ProvinciaService {
   }
 
   async create(dto: CreateProvinciaDto): Promise<ProvinciaRO> {
-
-   // *************** busco si existe alguno con el mismo nombre*************
+    // *************** busco si existe alguno con el mismo nombre*************
     /* const { nombre } = dto;
       const qb = await getRepository(Provincias)
       .createQueryBuilder('provincia')
@@ -38,21 +37,15 @@ export class ProvinciaService {
         HttpStatus.BAD_REQUEST,
       );
     } */
-   // NOTAAAAAASS: - es mejor esta manera para buscar uno con el mismo nombre
-   //              - dejo de usar el validate... mejor uso el ValidatePipe() en el controller
-   //              - podria crear un pipe... IsMismoNombrePipe() para controlar que no exista
-    //               el nombre del DTO como dato en la base de datos y unificar los mensajes
+    // NOTAAAAAASS: - es mejor esta manera para buscar uno con el mismo nombre
+    //              - dejo de usar el validate... mejor uso el ValidatePipe() en el controller
 
     const provincia = await this.provinciaRepository.findOne({
       nombre: `${dto.nombre}`,
     });
 
     if (provincia) {
-      const errors = { error: 'La provincia ya existe' };
-      throw new HttpException(
-        { message: 'Fallo al ingresar los datos', errors },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'La provicia ya existe' }, HttpStatus.BAD_REQUEST);
     }
 
     const newProvincia = new Provincias();
@@ -64,7 +57,6 @@ export class ProvinciaService {
   }
 
   private buildProvinciaRO(provincia: Provincias) {
-
     // tslint:disable-next-line:prefer-const
     let returnProv = {
       IdProvincia: provincia.IdProvincia,
