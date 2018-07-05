@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  HttpException,
-  HttpStatus,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, getRepository } from 'typeorm';
 import { Provincias } from './provincias.entity';
@@ -24,15 +19,17 @@ export class ProvinciaService {
   }
 
   async create(dto: CreateProvinciaDto): Promise<ProvinciaRO> {
-    // const { nombre } = dto;
-    /* const qb = await getRepository(Provincias)
+
+   // *************** busco si existe alguno con el mismo nombre*************
+    /* const { nombre } = dto;
+      const qb = await getRepository(Provincias)
       .createQueryBuilder('provincia')
       .where('provincia.nombre = :nombre', { nombre });
 
-    const provincia = await qb.getOne(); */
+     const provincia = await qb.getOne();
 
-    const errordto = await validate(dto);
-    Logger.log('sera' + errordto.toString());
+     // *******uso el validate() para validar el dato DTO segun su declaracion**********
+     const errordto = await validate(dto);
 
     if (errordto.length > 0) {
       const errors = { error: 'Nombre no válido' };
@@ -40,7 +37,11 @@ export class ProvinciaService {
         { message: 'Fallo al ingresar los datos', errors },
         HttpStatus.BAD_REQUEST,
       );
-    }
+    } */
+   // NOTAAAAAASS: - es mejor esta manera para buscar uno con el mismo nombre
+   //              - dejo de usar el validate... mejor uso el ValidatePipe() en el controller
+   //              - podria crear un pipe... IsMismoNombrePipe() para controlar que no exista
+    //               el nombre del DTO como dato en la base de datos y unificar los mensajes
 
     const provincia = await this.provinciaRepository.findOne({
       nombre: `${dto.nombre}`,
@@ -56,9 +57,6 @@ export class ProvinciaService {
 
     const newProvincia = new Provincias();
     newProvincia.nombre = dto.nombre;
-
-    Logger.log(JSON.stringify(dto));
-    Logger.log(JSON.stringify(newProvincia));
 
     const saveProvincia = await this.provinciaRepository.save(newProvincia);
 

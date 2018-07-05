@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Body, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ProvinciaService } from './provincia.service';
 import { Provincias } from './provincias.entity';
 import { ApiBearerAuth, ApiUseTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -23,6 +23,7 @@ export class ProvinciaController {
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 500, description: 'Server Error.' })
 
+  @UsePipes(new ValidationPipe())
   @Post('provincia')
   async create(@Body () provinciaData: CreateProvinciaDto) {
     return await this.provinciaService.create(provinciaData);
