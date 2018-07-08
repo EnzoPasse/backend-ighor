@@ -1,20 +1,19 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository } from 'typeorm';
-import { Provincias } from './provincias.entity';
+import { Repository } from 'typeorm';
 import { CreateProvinciaDto } from './dto/create-provincia.dto';
 import { ProvinciaRO } from './provincia.interface';
-import { validate } from 'class-validator';
-import { async } from 'rxjs/internal/scheduler/async';
+import { UpdateProvinciaDto } from './dto/update-provincia.dto';
+import { ProvinciaEntity } from './provincia-entity.entity';
 
 @Injectable()
 export class ProvinciaService {
   constructor(
-    @InjectRepository(Provincias)
-    private readonly provinciaRepository: Repository<Provincias>,
+    @InjectRepository(ProvinciaEntity)
+    private readonly provinciaRepository: Repository<ProvinciaEntity>,
   ) {}
 
-  async findAll(): Promise<Provincias[]> {
+  async findAll(): Promise<ProvinciaEntity[]> {
     return await this.provinciaRepository.find();
   }
 
@@ -45,10 +44,13 @@ export class ProvinciaService {
     });
 
     if (provincia) {
-      throw new HttpException({ message: 'La provicia ya existe' }, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        { message: 'La provicia ya existe' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    const newProvincia = new Provincias();
+    const newProvincia = new ProvinciaEntity();
     newProvincia.nombre = dto.nombre;
 
     const saveProvincia = await this.provinciaRepository.save(newProvincia);
@@ -56,7 +58,7 @@ export class ProvinciaService {
     return this.buildProvinciaRO(saveProvincia);
   }
 
-  private buildProvinciaRO(provincia: Provincias) {
+  private buildProvinciaRO(provincia: ProvinciaEntity) {
     // tslint:disable-next-line:prefer-const
     let returnProv = {
       IdProvincia: provincia.IdProvincia,
@@ -64,5 +66,35 @@ export class ProvinciaService {
     } as ProvinciaRO;
 
     return returnProv;
+  }
+
+  async update(id: number, dto: UpdateProvinciaDto): Promise<ProvinciaEntity> {
+    // el objeto que devuelve el repositorio es de tipo Entity
+
+    const toUpdate = await this.provinciaRepository.findOne(id);
+    if (!toUpdate) {
+      throw new HttpException(
+        { message: 'La provincia no existe' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // delete toUpdate.visible;
+    // delete objeto.propiedad ha borrar que sobre
+    // Luego copia profunda del dto al objeto encontrado
+    const updated = Object.assign(toUpdate, dto);
+
+    // devuelvo la entity del objeto guardado
+    return this.provinciaRepository.save(updated);
+  }
+
+  async delete(id: number) {
+    const todelete = await this.provinciaRepository.findOne(id);
+    if (!todelete) {
+      throw new HttpException(
+        { message: 'La provincia no existe' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return this.provinciaRepository.delete(id);
   }
 }

@@ -2,12 +2,12 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('provincias')
-export class Provincias {
+export class ProvinciaEntity {
 
 @PrimaryGeneratedColumn() IdProvincia: number;
 
 @Column() nombre: string;
 
-@Column({nullable: true}) visible: number;
+@Column({ default: 1 }) visible: number;
 
 }

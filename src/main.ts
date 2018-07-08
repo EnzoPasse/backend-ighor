@@ -11,7 +11,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
       .setTitle('IGHOR API')
-      .setDescription('La api del desarrollo de Ighor en NestJs')
+      .setDescription('La API de Ighor construida con Nodejs Framework NestJs')
       .setVersion('1.0.0')
       .setBasePath('api')
       .addBearerAuth()

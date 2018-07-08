@@ -7,4 +7,5 @@ export class CreateProvinciaDto{
     @ApiModelProperty()
     @IsAlpha({message: 'Valor del $property inválido!'})
     readonly nombre: string;
+
 }

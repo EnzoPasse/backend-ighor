@@ -4,8 +4,8 @@
   "port": 3306,
   "username": "root",
   "password": "",
-  "database": "test",
-  "synchronize": true,
+  "database": "datostn",
+  "synchronize": false,
   "logging": false,
   "entities": ["src/**/*.entity{.ts,.js}"]
 }
