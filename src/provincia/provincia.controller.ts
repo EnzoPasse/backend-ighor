@@ -24,7 +24,7 @@ import { ProvinciaEntity } from './provincia-entity.entity';
 export class ProvinciaController {
   constructor(private readonly provinciaService: ProvinciaService) {}
 
-  @ApiOperation({ title: 'retorna todas las provincias' })
+  @ApiOperation({ title: 'Retorna todas las provincias' })
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @Get('provincia')
